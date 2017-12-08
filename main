@@ -1,0 +1,138 @@
+/*
+ * ZenR est le nom provisoire de ce programme.
+ * Il se compose d'une série de fonction appelées dans la fonction main.
+ * L'algorithme sert à évaluer la journée de l'utilisateur et de lancer le programme de détente adéquat.
+ */
+package zenr;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
+import javax.media.*; /*Il faut télécharger JMF et importer le jar à la libraire depuis les proprietes du projet*/
+import java.net.*;
+
+/**
+ *
+ * @author Doctor
+ */
+public class ZenR {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // Ask user to score his day from 1 to 5
+        int userScoreDay = getUserDayScore();
+        // Evaluation of user score
+        String evaluateScore = evaluateUserDay(userScoreDay);
+        System.out.println(evaluateScore);
+        // Print duration of selected program
+        int program = chooseZenMode(userScoreDay);
+        
+        System.out.println("Chargement et lancement du programme..");
+        // Create and start program
+        // Not compiling pbs with player
+        // createProgram(userScoreDay);
+
+        
+    }
+    // Gets user score (todo : handle string exception)
+    static int getUserDayScore(){
+        System.out.println("Veillez noter votre journée de 1 à 5. 1 = Très mauvaise journée 5 = Très bonne journée");
+        Scanner sc = new Scanner(System.in);
+        int userDayScore = sc.nextInt();
+        while(userDayScore > 5 || userDayScore < 1) {
+            System.out.println("Choisir un chiffre entre 1 et 5");
+            sc = new Scanner(System.in);
+            userDayScore = sc.nextInt();
+        }
+        System.out.println("Votre note est "+userDayScore);
+        return userDayScore;
+    }
+    
+    // Textual evaluation of user day score
+    static String evaluateUserDay(int userDayScore){
+        String evalDay = "";
+        switch (userDayScore)
+        {
+          case 1:
+            evalDay = "Très mauvaise journée";
+            break;
+          case 2:
+            evalDay = "Mauvaise journée";
+            break;
+          case 3:
+            evalDay = "Journée moyenne";
+            break;
+          case 4:
+            evalDay = "Bonne journée ";
+            break;
+          case 5:
+            evalDay = "Très bonne journée ";
+            break;  
+          default:
+            evalDay = "Oups :/";
+        }
+        return evalDay;
+    }
+    
+    // The basic program is a 5 min relax and 5 min meditation tracks mp3
+    // For the best day, score 5, we will choose basic program and add a sequence of 5 min for each lower score
+    static void createProgram(int program) throws MalformedURLException, IOException, NoPlayerException, CannotRealizeException{
+       for(int i = 1; i < 7; i++)
+       {
+            // track 1 : relaxMusic (Duration 5 min)
+            File relaxMusic = new File("../../Desktop/relax.mp3");
+            // track 2 : meditationMusic (Duration 5 min)
+            //File meditationMusic = new File("../../Desktop/meditation.mp3");
+
+            // Create a Player object that realizes the audio
+            final Player p = Manager.createRealizedPlayer(relaxMusic.toURI().toURL());
+            // Start the music
+            p.start();
+            // Create a Scanner object for taking input from cmd
+            Scanner s=new Scanner(System.in);
+            // Read a line and store it in st
+            String st=s.nextLine();
+            // If user types 's', stop the audio
+             if(st.equals("s"))
+             {
+                 p.stop();
+             }
+        }
+}
+    
+    // Choose a program regarding score day
+    static int chooseZenMode(int userScoreDay){
+       int program  = 0;
+       switch (userScoreDay)
+        {
+          case 1:
+            program = 6;
+            System.out.println("Nous vous proposons une série de moments de détentente de méditation d'une durée de 30 minutes");
+            /*30 min = 5min détente + 5min méditation + 5min détente + 5min méditation + 5min détente +5min méditation */
+            break;
+          case 2:
+            program = 5; /*25 min = 5min détente + 5min méditation + 5min détente + 5min méditation + 5min détente*/
+            System.out.println("Nous vous proposons une série de moments de détentente de méditation d'une durée de 25 minutes");
+            break;
+          case 3:
+            program = 4; /*20 min = 5min détente + 5min méditation + 5min détente + 5min méditation */
+            System.out.println("Nous vous proposons une série de moments de détentente de méditation d'une durée de 20 minutes");
+            break;
+          case 4:
+            program = 3; /*15 min = 5min détente + 5min méditation + 5min détente */
+            System.out.println("Nous vous proposons une série de moments de détentente de méditation d'une durée de 15 minutes");
+            break;
+          case 5:
+            program = 2; /*10 min = 5min détente + 5min méditation */
+            System.out.println("Nous vous proposons une série de moments de détentente de méditation d'une durée de 10 minutes");
+            break;  
+          default:
+            program = 2; /*10 min minimum pour un programme*/
+            System.out.println("Nous vous proposons notre programme par défaut de 10 minutes");
+        }
+       return program;
+    }
+       
+}
